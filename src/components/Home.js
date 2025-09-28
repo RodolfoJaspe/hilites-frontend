@@ -153,6 +153,14 @@ function Home() {
     return (countryContinentPriority[a] || 999) - (countryContinentPriority[b] || 999);
   });
 
+  // Debug competition grouping
+  console.log('Competition grouping debug:', {
+    sampleCompetitionNames: filteredHighlights.slice(0, 5).map(h => h.competition?.name),
+    groupedHighlightsKeys: Object.keys(groupedHighlights),
+    sortedCountryGroups,
+    totalGroupedHighlights: Object.keys(groupedHighlights).length
+  });
+
   // Function to get flag for country/continent
   const getCountryContinentFlag = (countryOrContinent) => {
     const flags = {
