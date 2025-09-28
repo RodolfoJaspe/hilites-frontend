@@ -89,6 +89,7 @@ function Home() {
       return acc;
     }, {});
 
+    const targetDateStr = targetDate.toISOString().split('T')[0];
     console.log('Date distribution:', dateDistribution);
     console.log(`Filtered ${filtered.length} highlights for ${selectedDate} (${targetDateStr})`);
     
