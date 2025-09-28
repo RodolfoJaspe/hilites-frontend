@@ -57,7 +57,7 @@ function Home() {
     }
 
     // Filter highlights by date
-    return highlights.filter(highlight => {
+    const filtered = highlights.filter(highlight => {
       if (!highlight.date) return false;
       
       const highlightDate = new Date(highlight.date);
@@ -80,6 +80,19 @@ function Home() {
       
       return highlightDateStr === targetDateStr;
     });
+
+    // Debug: Show date distribution
+    const dateDistribution = highlights.reduce((acc, highlight) => {
+      if (!highlight.date) return acc;
+      const dateStr = new Date(highlight.date).toISOString().split('T')[0];
+      acc[dateStr] = (acc[dateStr] || 0) + 1;
+      return acc;
+    }, {});
+
+    console.log('Date distribution:', dateDistribution);
+    console.log(`Filtered ${filtered.length} highlights for ${selectedDate} (${targetDateStr})`);
+    
+    return filtered;
   };
 
   // Filter highlights by selected date first
