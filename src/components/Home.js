@@ -66,6 +66,18 @@ function Home() {
       const highlightDateStr = highlightDate.toISOString().split('T')[0];
       const targetDateStr = targetDate.toISOString().split('T')[0];
       
+      // Debug logging for first few highlights
+      if (highlights.indexOf(highlight) < 3) {
+        console.log('Date filtering debug:', {
+          originalDate: highlight.date,
+          highlightDate: highlightDate,
+          highlightDateStr,
+          targetDateStr,
+          selectedDate,
+          matches: highlightDateStr === targetDateStr
+        });
+      }
+      
       return highlightDateStr === targetDateStr;
     });
   };
