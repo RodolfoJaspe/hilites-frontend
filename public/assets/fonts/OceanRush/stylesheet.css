@@ -1,0 +1,13 @@
+@font-face {
+    font-family: 'Ocean Rush DEMO';
+    src: url('OceanRushDEMO.eot');
+    src: url('OceanRushDEMO.eot?#iefix') format('embedded-opentype'),
+        url('OceanRushDEMO.woff2') format('woff2'),
+        url('OceanRushDEMO.woff') format('woff'),
+        url('OceanRushDEMO.ttf') format('truetype'),
+        url('OceanRushDEMO.svg#OceanRushDEMO') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+

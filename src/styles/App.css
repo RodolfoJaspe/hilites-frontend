@@ -1,0 +1,28 @@
+#app {
+    text-align: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #000;
+  }
+  
+  @font-face {
+    font-family: "Ocean Rush";
+    src: url("../../public/assets/fonts/OceanRush/OceanRushDEMO.eot");
+    src: url("../../public/assets/fonts/OceanRush/OceanRushDEMO.eot?#iefix")
+        format("embedded-opentype"),
+      url("../../public/assets/fonts/OceanRush/OceanRushDEMO.woff2") format("woff2"),
+      url("../../public/assets/fonts/OceanRush/OceanRushDEMO.woff") format("woff"),
+      url("../../public/assets/fonts/OceanRush/OceanRushDEMO.ttf") format("truetype"),
+      url("../../public/assets/fonts/OceanRush/OceanRushDEMO.svg#OceanRushDEMO")
+        format("svg");
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
