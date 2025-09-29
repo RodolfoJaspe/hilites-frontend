@@ -51,10 +51,17 @@ const DateNavigation = ({ selectedDate, onDateChange }) => {
       if (selectedIndex !== -1) {
         const selectedElement = scrollContainerRef.current.children[selectedIndex];
         if (selectedElement) {
-          selectedElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'center'
+          // Scroll horizontally within the date navigation container only
+          const container = scrollContainerRef.current;
+          const elementRect = selectedElement.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+          
+          // Calculate the scroll position to center the element horizontally
+          const scrollLeft = selectedElement.offsetLeft - (container.offsetWidth / 2) + (selectedElement.offsetWidth / 2);
+          
+          container.scrollTo({
+            left: scrollLeft,
+            behavior: 'smooth'
           });
         }
       }

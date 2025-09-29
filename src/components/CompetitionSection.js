@@ -81,7 +81,16 @@ const CompetitionSection = ({
 
   return (
     <div className={`competition-section ${isSubCompetition ? 'sub-competition' : ''}`}>
-      <div className="competition-header" onClick={onToggle}>
+      <div className="competition-header" 
+           tabIndex={-1}
+           onClick={(e) => {
+             e.preventDefault();
+             e.stopPropagation();
+             onToggle();
+           }}
+           onMouseDown={(e) => {
+             e.preventDefault();
+           }}>
         <div className="competition-info">
           {!isSubCompetition && (
             <span className="competition-flag">{getCompetitionFlag(competition)}</span>
@@ -118,7 +127,6 @@ const CompetitionSection = ({
   const HighlightCard = ({ highlight, embedToken, enhanceEmbedWithToken }) => {
   const handlePlay = () => {
     // TODO: Implement video playback
-    console.log('Playing highlight:', highlight.title);
   };
 
   const handleCopyEmbed = () => {

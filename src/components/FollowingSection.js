@@ -41,7 +41,16 @@ const FollowingSection = ({ highlights, embedToken, loading }) => {
 
   return (
     <div className="following-section">
-      <div className="following-header" onClick={() => setIsExpanded(!isExpanded)}>
+      <div className="following-header" 
+           tabIndex={-1}
+           onClick={(e) => {
+             e.preventDefault();
+             e.stopPropagation();
+             setIsExpanded(!isExpanded);
+           }}
+           onMouseDown={(e) => {
+             e.preventDefault();
+           }}>
         <div className="following-title">
           <span className="star-icon">⭐</span>
           <span>Following</span>
@@ -81,7 +90,6 @@ const FollowingSection = ({ highlights, embedToken, loading }) => {
 const HighlightCard = ({ highlight, embedToken, enhanceEmbedWithToken }) => {
   const handlePlay = () => {
     // TODO: Implement video playback
-    console.log('Playing highlight:', highlight.title);
   };
 
   const handleCopyEmbed = () => {

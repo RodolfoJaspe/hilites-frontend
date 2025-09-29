@@ -79,21 +79,6 @@ function Home() {
   // Filter highlights by selected date first
   const filteredHighlights = filterHighlightsByDate(highlights, selectedDate);
   
-  // Debug logging (development only)
-  if (process.env.NODE_ENV === 'development') {
-    const today = new Date();
-    const localTodayStr = today.getFullYear() + '-' + 
-      String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-      String(today.getDate()).padStart(2, '0');
-    
-    console.log('Date filtering debug:', {
-      selectedDate,
-      totalHighlights: highlights.length,
-      filteredHighlights: filteredHighlights.length,
-      todayUTC: new Date().toISOString().split('T')[0],
-      todayLocal: localTodayStr
-    });
-  }
 
   // Group highlights hierarchically by country/continent, then by competition
   const groupedHighlights = filteredHighlights.reduce((acc, highlight) => {
@@ -208,7 +193,6 @@ function Home() {
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
-    console.log('Date changed to:', date);
   };
 
   const toggleCompetition = (countryOrContinent, competitionId = null) => {
@@ -284,7 +268,15 @@ function Home() {
             <div key={countryOrContinent} className="country-continent-group">
               <div 
                 className="country-continent-header"
-                onClick={() => toggleCompetition(countryOrContinent)}
+                tabIndex={-1}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleCompetition(countryOrContinent);
+                }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                }}
               >
                 <div className="country-continent-info">
                   <span className="country-continent-flag">

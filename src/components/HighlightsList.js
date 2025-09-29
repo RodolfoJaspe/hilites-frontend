@@ -137,7 +137,6 @@ const HighlightsList = ({ highlights, loading, error, onSearch, onFilterByCompet
                   className="watch-button"
                   onClick={() => {
                     // Handle video playback
-                    console.log('Playing highlight:', highlight.title);
                   }}
                 >
                   ▶️ Watch Highlights
