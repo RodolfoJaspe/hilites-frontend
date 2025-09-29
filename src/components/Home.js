@@ -62,9 +62,15 @@ function Home() {
       
       const highlightDate = new Date(highlight.date);
       
-      // Convert both dates to YYYY-MM-DD format for comparison (UTC)
-      const highlightDateStr = highlightDate.toISOString().split('T')[0];
-      const targetDateStr = targetDate.toISOString().split('T')[0];
+      // Convert both dates to YYYY-MM-DD format for comparison using local timezone
+      // This ensures we compare the actual calendar dates, not UTC dates
+      const highlightDateStr = highlightDate.getFullYear() + '-' + 
+        String(highlightDate.getMonth() + 1).padStart(2, '0') + '-' + 
+        String(highlightDate.getDate()).padStart(2, '0');
+      
+      const targetDateStr = targetDate.getFullYear() + '-' + 
+        String(targetDate.getMonth() + 1).padStart(2, '0') + '-' + 
+        String(targetDate.getDate()).padStart(2, '0');
       
       return highlightDateStr === targetDateStr;
     });
@@ -73,13 +79,21 @@ function Home() {
   // Filter highlights by selected date first
   const filteredHighlights = filterHighlightsByDate(highlights, selectedDate);
   
-  // Debug logging
-  console.log('Date filtering debug:', {
-    selectedDate,
-    totalHighlights: highlights.length,
-    filteredHighlights: filteredHighlights.length,
-    today: new Date().toISOString().split('T')[0]
-  });
+  // Debug logging (development only)
+  if (process.env.NODE_ENV === 'development') {
+    const today = new Date();
+    const localTodayStr = today.getFullYear() + '-' + 
+      String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+      String(today.getDate()).padStart(2, '0');
+    
+    console.log('Date filtering debug:', {
+      selectedDate,
+      totalHighlights: highlights.length,
+      filteredHighlights: filteredHighlights.length,
+      todayUTC: new Date().toISOString().split('T')[0],
+      todayLocal: localTodayStr
+    });
+  }
 
   // Group highlights hierarchically by country/continent, then by competition
   const groupedHighlights = filteredHighlights.reduce((acc, highlight) => {

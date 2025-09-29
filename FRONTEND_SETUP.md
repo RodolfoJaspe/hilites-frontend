@@ -161,3 +161,4 @@ The app is fully responsive with:
 - Optimized layouts for small screens
 - Collapsible navigation on mobile
 - Swipe-friendly card layouts
+

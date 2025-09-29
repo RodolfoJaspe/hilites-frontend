@@ -1,5 +1,9 @@
 // API service for communicating with the Hilites backend
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://hilites-backend.vercel.app/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 
+  (process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:3000/api' 
+    : 'https://hilites-backend.vercel.app/api');
+
 
 class ApiService {
   constructor() {
