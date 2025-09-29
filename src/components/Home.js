@@ -57,7 +57,7 @@ function Home() {
     }
 
     // Filter highlights by date
-    const filtered = highlights.filter(highlight => {
+    return highlights.filter(highlight => {
       if (!highlight.date) return false;
       
       const highlightDate = new Date(highlight.date);
@@ -66,34 +66,8 @@ function Home() {
       const highlightDateStr = highlightDate.toISOString().split('T')[0];
       const targetDateStr = targetDate.toISOString().split('T')[0];
       
-      // Debug logging for first few highlights
-      if (highlights.indexOf(highlight) < 3) {
-        console.log('Date filtering debug:', {
-          originalDate: highlight.date,
-          highlightDate: highlightDate,
-          highlightDateStr,
-          targetDateStr,
-          selectedDate,
-          matches: highlightDateStr === targetDateStr
-        });
-      }
-      
       return highlightDateStr === targetDateStr;
     });
-
-    // Debug: Show date distribution
-    const dateDistribution = highlights.reduce((acc, highlight) => {
-      if (!highlight.date) return acc;
-      const dateStr = new Date(highlight.date).toISOString().split('T')[0];
-      acc[dateStr] = (acc[dateStr] || 0) + 1;
-      return acc;
-    }, {});
-
-    const targetDateStr = targetDate.toISOString().split('T')[0];
-    console.log('Date distribution:', dateDistribution);
-    console.log(`Filtered ${filtered.length} highlights for ${selectedDate} (${targetDateStr})`);
-    
-    return filtered;
   };
 
   // Filter highlights by selected date first
@@ -177,14 +151,6 @@ function Home() {
   // Sort countries/continents by priority
   const sortedCountryGroups = Object.keys(groupedHighlights).sort((a, b) => {
     return (countryContinentPriority[a] || 999) - (countryContinentPriority[b] || 999);
-  });
-
-  // Debug competition grouping
-  console.log('Competition grouping debug:', {
-    sampleCompetitionNames: filteredHighlights.slice(0, 5).map(h => h.competition?.name),
-    groupedHighlightsKeys: Object.keys(groupedHighlights),
-    sortedCountryGroups,
-    totalGroupedHighlights: Object.keys(groupedHighlights).length
   });
 
   // Function to get flag for country/continent
