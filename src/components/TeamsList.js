@@ -206,3 +206,4 @@ const TeamsList = ({ teams, loading, error, meta, onFilterByCountry, onFilterByL
 
 export default TeamsList;
 
+

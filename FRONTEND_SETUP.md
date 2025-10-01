@@ -162,3 +162,4 @@ The app is fully responsive with:
 - Collapsible navigation on mobile
 - Swipe-friendly card layouts
 
+
