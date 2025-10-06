@@ -1,6 +1,7 @@
 // API service for communicating with the Hilites backend
-// Force local backend for development
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL 
+  ? `${process.env.REACT_APP_API_URL}/api`
+  : 'http://localhost:3000/api';
 
 console.log('API_BASE_URL:', API_BASE_URL);
 
