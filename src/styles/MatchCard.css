@@ -1,0 +1,425 @@
+/* Match Card Styles */
+.match-card {
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+  border: 1px solid #333;
+}
+
+.match-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border-color: #007bff;
+}
+
+/* Collapsed State */
+.match-card.collapsed {
+  padding: 15px 20px;
+  min-height: 80px;
+}
+
+.match-card.collapsed .match-competition {
+  font-size: 14px;
+  color: #007bff;
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.match-teams-collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.team-collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.team-name-small {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e0e0e0;
+  text-align: center;
+  flex: 1;
+}
+
+.vs-text {
+  font-size: 12px;
+  color: #888;
+  font-weight: bold;
+  min-width: 30px;
+  text-align: center;
+}
+
+/* Expanded State */
+.match-card.expanded {
+  padding: 20px;
+  min-height: 200px;
+}
+
+.match-card.expanded .match-competition {
+  font-size: 16px;
+  color: #007bff;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.match-teams-expanded {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.team-expanded {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+
+.team-name-large {
+  font-size: 16px;
+  font-weight: 700;
+  color: #e0e0e0;
+  text-align: center;
+}
+
+.vs-text-large {
+  font-size: 18px;
+  color: #007bff;
+  font-weight: bold;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Video Section */
+.video-section {
+  margin-top: 20px;
+}
+
+.discovering-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 30px;
+  background: #2a2a2a;
+  border-radius: 8px;
+  border: 2px dashed #007bff;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #333;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.discovering-state p {
+  color: #007bff;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.discovery-error {
+  background: #dc3545;
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.clear-error {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.clear-error:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+/* Video Container */
+.video-container {
+  width: 100%;
+}
+
+.video-player {
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.video-iframe-inline {
+  width: 100%;
+  height: 250px;
+  border: none;
+}
+
+.video-info-inline {
+  padding: 15px;
+  background: #2a2a2a;
+}
+
+.video-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.video-header h4 {
+  color: #fff;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.3;
+  flex: 1;
+}
+
+.show-all-videos-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+}
+
+.show-all-videos-btn:hover {
+  background: #0056b3;
+}
+
+.video-meta {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  color: #ccc;
+  font-size: 14px;
+}
+
+.video-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Video Thumbnail Container */
+.video-thumbnail-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.video-thumbnail {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  background: #2a2a2a;
+}
+
+.video-thumbnail:hover {
+  transform: scale(1.05);
+}
+
+.video-thumbnail img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
+.thumbnail-placeholder {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: #666;
+  background: #2a2a2a;
+}
+
+.play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.video-thumbnail:hover .play-overlay {
+  opacity: 1;
+}
+
+.play-button-overlay {
+  background: #007bff;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+}
+
+.video-title-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  padding: 15px 10px 10px;
+  color: white;
+}
+
+.video-title-overlay h5 {
+  margin: 0 0 5px 0;
+  font-size: 14px;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.video-title-overlay span {
+  font-size: 12px;
+  color: #ccc;
+}
+
+.no-highlights {
+  text-align: center;
+  padding: 30px;
+  color: #888;
+  background: #2a2a2a;
+  border-radius: 8px;
+  border: 2px dashed #444;
+}
+
+.no-highlights p {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .match-card.collapsed {
+    padding: 12px 15px;
+  }
+  
+  .match-card.expanded {
+    padding: 15px;
+  }
+  
+  .team-logo-small {
+    width: 25px;
+    height: 25px;
+  }
+  
+  .team-name-small {
+    font-size: 12px;
+  }
+  
+  .team-logo-large {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .team-name-large {
+    font-size: 14px;
+  }
+  
+  .vs-text-large {
+    font-size: 16px;
+  }
+  
+  .video-iframe-inline {
+    height: 200px;
+  }
+  
+  .video-thumbnail-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .video-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .video-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .show-all-videos-btn {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .match-teams-collapsed {
+    gap: 10px;
+  }
+  
+  .match-teams-expanded {
+    gap: 15px;
+  }
+  
+  .team-logo-large {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .team-name-large {
+    font-size: 13px;
+  }
+  
+  .video-iframe-inline {
+    height: 180px;
+  }
+}

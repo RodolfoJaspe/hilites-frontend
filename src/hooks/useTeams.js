@@ -116,11 +116,14 @@ export const useTeams = () => {
 
   const fetchMeta = useCallback(async () => {
     try {
-      const [countriesRes, leaguesRes, confederationsRes] = await Promise.all([
-        apiService.getCountries(),
-        apiService.getLeagues(),
-        apiService.getConfederations()
-      ]);
+      // Stagger the meta requests to prevent rate limiting
+      const countriesRes = await apiService.getCountries();
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const leaguesRes = await apiService.getLeagues();
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const confederationsRes = await apiService.getConfederations();
 
       setMeta({
         countries: countriesRes.countries || [],
@@ -140,13 +143,16 @@ export const useTeams = () => {
     }
   }, []);
 
-  // Load teams and meta on mount
+  // Load teams and meta on mount - Stagger requests to prevent rate limiting
   useEffect(() => {
     const loadInitialData = async () => {
-      await Promise.all([
-        fetchTeams(),
-        fetchMeta()
-      ]);
+      // First load teams
+      await fetchTeams();
+      
+      // Then load meta data with a small delay
+      setTimeout(() => {
+        fetchMeta();
+      }, 200);
     };
 
     loadInitialData();
@@ -165,5 +171,7 @@ export const useTeams = () => {
     fetchMeta
   };
 };
+
+
 
 

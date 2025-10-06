@@ -10,15 +10,15 @@
 
 }
 
-/* Hierarchical Country/Continent Grouping */
-.country-continent-group {
+/* Competition Grouping */
+.competition-group {
   margin-bottom: 20px;
   border: 1px solid #333;
   border-radius: 8px;
   overflow: hidden;
 }
 
-.country-continent-header {
+.competition-header {
   background: #1a1a1a;
   padding: 16px 20px;
   cursor: pointer;
@@ -29,24 +29,30 @@
   border-bottom: 1px solid #333;
 }
 
-.country-continent-header:hover {
+.competition-header:hover {
   background: #2a2a2a;
 }
 
-.country-continent-info {
+.competition-info {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.country-continent-flag {
+.competition-flag {
   font-size: 20px;
 }
 
-.country-continent-name {
+.competition-name {
   font-size: 18px;
   font-weight: 600;
   color: #fff;
+}
+
+.match-count {
+  font-size: 14px;
+  color: #888;
+  font-weight: normal;
 }
 
 .expand-icon {
@@ -55,8 +61,25 @@
   transition: transform 0.2s;
 }
 
-.country-continent-content {
-  background: #111;
+.competition-content {
+  background: #000;
+  padding: 16px;
+}
+
+.matches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 16px;
+}
+
+.no-matches {
+  text-align: center;
+  padding: 60px 20px;
+  background: #1a1a1a;
+  margin: 20px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: #888;
 }
 
 .competition-section.sub-competition {
@@ -142,6 +165,10 @@
   .competitions-container {
     padding: 4px;  
     padding-top: 16px;
+  }
+  
+  .matches-grid {
+    grid-template-columns: 1fr;
   }
   
   .loading-container,

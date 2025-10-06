@@ -1,40 +1,35 @@
 import React, { useState } from 'react';
-import { useHighlights } from '../hooks/useHighlights';
+import { useMatches } from '../hooks/useMatches';
 import { useTeams } from '../hooks/useTeams';
 import '../styles/Home.css';
-import CompetitionSection from './CompetitionSection';
 import DateNavigation from './DateNavigation';
 import FollowingSection from './FollowingSection';
+import MatchCard from './MatchCard';
 
 function Home() {
   const [selectedDate, setSelectedDate] = useState('today');
   const [expandedCompetitions, setExpandedCompetitions] = useState({});
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // TODO: Get from auth context
+  const [isLoggedIn] = useState(false); // TODO: Get from auth context
   
-  // Highlights data and functions
+  // Matches data and functions
   const {
-    highlights,
-    leagues,
-    embedToken,
-    loading: highlightsLoading,
-    error: highlightsError,
-    searchHighlights,
-    getHighlightsByCompetition,
-    refreshHighlights
-  } = useHighlights();
+    matches,
+    loading: matchesLoading,
+    error: matchesError,
+    fetchMatches
+  } = useMatches();
 
-  // Teams data and functions
+  // Teams data and functions (keeping for future use)
   const {
-    meta: teamsMeta,
     getTeamsByCountry,
     getTeamsByLeague,
     fetchTeams
   } = useTeams();
 
-  // Filter highlights by selected date
-  const filterHighlightsByDate = (highlights, selectedDate) => {
+  // Filter matches by selected date
+  const filterMatchesByDate = (matches, selectedDate) => {
     if (!selectedDate) {
-      return highlights;
+      return matches;
     }
 
     const today = new Date();
@@ -53,178 +48,124 @@ function Home() {
     }
 
     if (!targetDate) {
-      return highlights;
+      return matches;
     }
 
-    // Filter highlights by date
-    return highlights.filter(highlight => {
-      if (!highlight.date) return false;
+    // Filter matches by date
+    return matches.filter(match => {
+      if (!match.match_date) return false;
       
-      const highlightDate = new Date(highlight.date);
+      const matchDate = new Date(match.match_date);
       
       // Convert both dates to YYYY-MM-DD format for comparison using local timezone
       // This ensures we compare the actual calendar dates, not UTC dates
-      const highlightDateStr = highlightDate.getFullYear() + '-' + 
-        String(highlightDate.getMonth() + 1).padStart(2, '0') + '-' + 
-        String(highlightDate.getDate()).padStart(2, '0');
+      const matchDateStr = matchDate.getFullYear() + '-' + 
+        String(matchDate.getMonth() + 1).padStart(2, '0') + '-' + 
+        String(matchDate.getDate()).padStart(2, '0');
       
       const targetDateStr = targetDate.getFullYear() + '-' + 
         String(targetDate.getMonth() + 1).padStart(2, '0') + '-' + 
         String(targetDate.getDate()).padStart(2, '0');
       
-      return highlightDateStr === targetDateStr;
+      return matchDateStr === targetDateStr;
     });
   };
 
-  // Filter highlights by selected date first
-  const filteredHighlights = filterHighlightsByDate(highlights, selectedDate);
+  // Filter matches by selected date first
+  const filteredMatches = filterMatchesByDate(matches, selectedDate);
   
 
-  // Group highlights hierarchically by country/continent, then by competition
-  const groupedHighlights = filteredHighlights.reduce((acc, highlight) => {
-    const competition = highlight.competition;
-    if (!competition || !competition.id) {
+  // Group matches hierarchically by competition
+  const groupedMatches = filteredMatches.reduce((acc, match) => {
+    const competitionName = match.competition_name;
+    if (!competitionName) {
       return acc;
     }
     
-    const competitionName = competition.name;
-    const [countryOrContinent, specificCompetition] = competitionName.split(': ');
-    
-    if (!countryOrContinent) {
-      return acc;
-    }
-    
-    // Initialize country/continent group if it doesn't exist
-    if (!acc[countryOrContinent]) {
-      acc[countryOrContinent] = {};
-    }
-    
-    // Initialize specific competition within the country/continent
-    if (!acc[countryOrContinent][competition.id]) {
-      acc[countryOrContinent][competition.id] = {
-        name: specificCompetition || competitionName,
-        highlights: []
+    // Initialize competition group if it doesn't exist
+    if (!acc[competitionName]) {
+      acc[competitionName] = {
+        name: competitionName,
+        matches: []
       };
     }
     
-    acc[countryOrContinent][competition.id].highlights.push(highlight);
+    acc[competitionName].matches.push(match);
     return acc;
   }, {});
 
-  // Define priority order for countries/continents
-  const countryContinentPriority = {
-    'EUROPE': 1,
-    'ENGLAND': 2,
-    'SPAIN': 3,
-    'ITALY': 4,
-    'GERMANY': 5,
-    'FRANCE': 6,
-    'NETHERLANDS': 7,
-    'PORTUGAL': 8,
-    'BELGIUM': 9,
-    'AUSTRIA': 10,
-    'SWITZERLAND': 11,
-    'TURKEY': 12,
-    'GREECE': 13,
-    'SERBIA': 14,
-    'NORWAY': 15,
-    'USA': 16,
-    'BRAZIL': 17,
-    'ARGENTINA': 18,
-    'MEXICO': 19,
-    'COLOMBIA': 20,
-    'PERU': 21,
-    'CHILE': 22,
-    'URUGUAY': 23,
-    'PARAGUAY': 24,
-    'ECUADOR': 25,
-    'VENEZUELA': 26,
-    'AFRICA': 27,
-    'ASIA': 28,
-    'OCEANIA': 29,
-    'NORTH AMERICA': 30,
-    'SOUTH AMERICA': 31,
-    'CENTRAL AMERICA': 32
+  // Define priority order for competitions
+  const competitionPriority = {
+    'Premier League': 1,
+    'La Liga': 2,
+    'Primera Division': 2,
+    'Serie A': 3,
+    'Bundesliga': 4,
+    'Ligue 1': 5,
+    'Champions League': 6,
+    'UEFA Champions League': 6,
+    'Europa League': 7,
+    'Conference League': 8,
+    'FA Cup': 9,
+    'Copa del Rey': 10,
+    'Coppa Italia': 11,
+    'DFB-Pokal': 12,
+    'Coupe de France': 13,
+    'EFL Cup': 14,
+    'Super Cup': 15
   };
 
-  // Sort countries/continents by priority
-  const sortedCountryGroups = Object.keys(groupedHighlights).sort((a, b) => {
-    return (countryContinentPriority[a] || 999) - (countryContinentPriority[b] || 999);
+  // Sort competitions by priority
+  const sortedCompetitions = Object.keys(groupedMatches).sort((a, b) => {
+    return (competitionPriority[a] || 999) - (competitionPriority[b] || 999);
   });
 
-  // Function to get flag for country/continent
-  const getCountryContinentFlag = (countryOrContinent) => {
-    const flags = {
-      'EUROPE': '🏆',
-      'ENGLAND': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-      'SPAIN': '🇪🇸',
-      'ITALY': '🇮🇹',
-      'GERMANY': '🇩🇪',
-      'FRANCE': '🇫🇷',
-      'NETHERLANDS': '🇳🇱',
-      'PORTUGAL': '🇵🇹',
-      'BELGIUM': '🇧🇪',
-      'AUSTRIA': '🇦🇹',
-      'SWITZERLAND': '🇨🇭',
-      'TURKEY': '🇹🇷',
-      'GREECE': '🇬🇷',
-      'SERBIA': '🇷🇸',
-      'NORWAY': '🇳🇴',
-      'USA': '🇺🇸',
-      'BRAZIL': '🇧🇷',
-      'ARGENTINA': '🇦🇷',
-      'MEXICO': '🇲🇽',
-      'COLOMBIA': '🇨🇴',
-      'PERU': '🇵🇪',
-      'CHILE': '🇨🇱',
-      'URUGUAY': '🇺🇾',
-      'PARAGUAY': '🇵🇾',
-      'ECUADOR': '🇪🇨',
-      'VENEZUELA': '🇻🇪',
-      'AFRICA': '🌍',
-      'ASIA': '🌏',
-      'OCEANIA': '🌏',
-      'NORTH AMERICA': '🌎',
-      'SOUTH AMERICA': '🌎',
-      'CENTRAL AMERICA': '🌎'
+  // Function to get display name for competition (maps backend names to frontend display names)
+  const getCompetitionDisplayName = (competitionName) => {
+    const displayNames = {
+      'Primera Division': 'La Liga',
+      'UEFA Champions League': 'Champions League',
+      // Add more mappings as needed
     };
-    return flags[countryOrContinent] || '⚽️';
+    return displayNames[competitionName] || competitionName;
+  };
+
+  // Function to get flag for competition
+  const getCompetitionFlag = (competitionName) => {
+  const flags = {
+    'Premier League': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    'La Liga': '🇪🇸',
+    'Primera Division': '🇪🇸',
+    'Serie A': '🇮🇹',
+    'Bundesliga': '🇩🇪',
+    'Ligue 1': '🇫🇷',
+    'Champions League': '🏆',
+    'UEFA Champions League': '🏆',
+    'Europa League': '🏆',
+    'Conference League': '🏆',
+    'FA Cup': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    'Copa del Rey': '🇪🇸',
+    'Coppa Italia': '🇮🇹',
+    'DFB-Pokal': '🇩🇪',
+    'Coupe de France': '🇫🇷',
+    'EFL Cup': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    'Super Cup': '🏆'
+  };
+    return flags[competitionName] || '⚽️';
   };
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
 
-  const toggleCompetition = (countryOrContinent, competitionId = null) => {
-    if (competitionId) {
-      // Toggle specific competition within a country/continent
-      const key = `${countryOrContinent}-${competitionId}`;
-      setExpandedCompetitions(prev => ({
-        ...prev,
-        [key]: !prev[key]
-      }));
-    } else {
-      // Toggle entire country/continent group
-      setExpandedCompetitions(prev => ({
-        ...prev,
-        [countryOrContinent]: !prev[countryOrContinent]
-      }));
-    }
+  const toggleCompetition = (competitionName) => {
+    setExpandedCompetitions(prev => ({
+      ...prev,
+      [competitionName]: !prev[competitionName]
+    }));
   };
 
-  const handleHighlightsSearch = async (query) => {
-    await searchHighlights(query);
-  };
-
-  const handleHighlightsCompetitionFilter = async (competition) => {
-    if (competition) {
-      await getHighlightsByCompetition(competition);
-    } else {
-      // Reset to all highlights
-      window.location.reload();
-    }
-  };
-
+  // Handler functions (keeping for future use)
   const handleTeamsCountryFilter = async (country) => {
     if (country) {
       await getTeamsByCountry(country);
@@ -252,63 +193,57 @@ function Home() {
       {/* Following Section (only if logged in) */}
       {isLoggedIn && (
         <FollowingSection 
-          highlights={filteredHighlights}
-          embedToken={embedToken}
-          loading={highlightsLoading}
+          matches={filteredMatches}
+          loading={matchesLoading}
         />
       )}
 
-      {/* Competition Sections - Hierarchical by Country/Continent */}
+      {/* Competition Sections */}
       <div className="competitions-container">
-        {sortedCountryGroups.map(countryOrContinent => {
-          const countryGroup = groupedHighlights[countryOrContinent];
-          const competitions = Object.keys(countryGroup);
+        {sortedCompetitions.map(competitionName => {
+          const competition = groupedMatches[competitionName];
           
           return (
-            <div key={countryOrContinent} className="country-continent-group">
+            <div key={competitionName} className="competition-group">
               <div 
-                className="country-continent-header"
+                className="competition-header"
                 tabIndex={-1}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  toggleCompetition(countryOrContinent);
+                  toggleCompetition(competitionName);
                 }}
                 onMouseDown={(e) => {
                   e.preventDefault();
                 }}
               >
-                <div className="country-continent-info">
-                  <span className="country-continent-flag">
-                    {getCountryContinentFlag(countryOrContinent)}
+                <div className="competition-info">
+                  <span className="competition-flag">
+                    {getCompetitionFlag(competitionName)}
                   </span>
-                  <span className="country-continent-name">
-                    {countryOrContinent} 
+                  <span className="competition-name">
+                    {getCompetitionDisplayName(competitionName)}
+                  </span>
+                  <span className="match-count">
+                    ({competition.matches.length} matches)
                   </span>
                 </div>
                 <span className="expand-icon">
-                  {expandedCompetitions[countryOrContinent] ? '▼' : '▶'}
+                  {expandedCompetitions[competitionName] ? '▼' : '▶'}
                 </span>
               </div>
               
-              {expandedCompetitions[countryOrContinent] && (
-                <div className="country-continent-content">
-                  {competitions.map(competitionId => {
-                    const competition = countryGroup[competitionId];
-                    
-                    return (
-                      <CompetitionSection
-                        key={`${countryOrContinent}-${competitionId}`}
-                        competition={competition.name}
-                        highlights={competition.highlights}
-                        embedToken={embedToken}
-                        isExpanded={expandedCompetitions[`${countryOrContinent}-${competitionId}`]}
-                        onToggle={() => toggleCompetition(countryOrContinent, competitionId)}
-                        loading={highlightsLoading}
-                        isSubCompetition={true}
+              {expandedCompetitions[competitionName] && (
+                <div className="competition-content">
+                  <div className="matches-grid">
+                    {competition.matches.map(match => (
+                      <MatchCard
+                        key={match.id}
+                        match={match}
+                        showHighlights={true}
                       />
-                    );
-                  })}
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -316,20 +251,27 @@ function Home() {
         })}
       </div>
 
-      {highlightsLoading && (
+      {matchesLoading && (
         <div className="loading-container">
           <div className="loading-spinner"></div>
-          <p>Loading highlights...</p>
+          <p>Loading matches...</p>
         </div>
       )}
 
-      {highlightsError && (
+      {matchesError && (
         <div className="error-container">
-          <h3>⚠️ Error Loading Highlights</h3>
-          <p>{highlightsError}</p>
-          <button onClick={refreshHighlights} className="retry-button">
+          <h3>⚠️ Error Loading Matches</h3>
+          <p>{matchesError}</p>
+          <button onClick={fetchMatches} className="retry-button">
             Try Again
           </button>
+        </div>
+      )}
+
+      {filteredMatches.length === 0 && !matchesLoading && (
+        <div className="no-matches">
+          <h3>No matches found</h3>
+          <p>Try selecting a different date or check back later for new matches.</p>
         </div>
       )}
     </div>

@@ -1,17 +1,27 @@
 // API service for communicating with the Hilites backend
-const API_BASE_URL = process.env.REACT_APP_API_URL || 
-  (process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:3000/api' 
-    : 'https://hilites-backend.vercel.app/api');
+// Force local backend for development
+const API_BASE_URL = 'http://localhost:3000/api';
+
+console.log('API_BASE_URL:', API_BASE_URL);
 
 
 class ApiService {
   constructor() {
     this.baseURL = API_BASE_URL;
+    this.lastRequestTime = 0;
+    this.requestDelay = 100; // 100ms delay between requests
   }
 
   // Generic request method
   async request(endpoint, options = {}) {
+    // Throttle requests to prevent rate limiting
+    const now = Date.now();
+    const timeSinceLastRequest = now - this.lastRequestTime;
+    if (timeSinceLastRequest < this.requestDelay) {
+      await new Promise(resolve => setTimeout(resolve, this.requestDelay - timeSinceLastRequest));
+    }
+    this.lastRequestTime = Date.now();
+
     const url = `${this.baseURL}${endpoint}`;
     
     const config = {
@@ -139,6 +149,36 @@ class ApiService {
 
   async getConfederations() {
     return this.get('/teams/meta/confederations');
+  }
+
+  // Match data methods (new AI-powered system)
+  async getMatches(params = {}) {
+    return this.get('/matches', params);
+  }
+
+  async getMatchById(id) {
+    return this.get(`/matches/${id}`);
+  }
+
+  async getUpcomingMatches(params = {}) {
+    return this.get('/matches/upcoming', params);
+  }
+
+  // AI Discovery methods
+  async getMatchesWithoutHighlights(params = {}) {
+    return this.get('/ai-discovery/matches-without-highlights', params);
+  }
+
+  async discoverHighlights(matchId) {
+    return this.post('/ai-discovery/process', { matchId });
+  }
+
+  async getAIDiscoveredHighlights(matchId) {
+    return this.get(`/ai-discovery/highlights/${matchId}`);
+  }
+
+  async getAIDiscoveryStatus() {
+    return this.get('/ai-discovery/status');
   }
 
   // User preferences methods (requires authentication)

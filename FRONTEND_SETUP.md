@@ -163,3 +163,5 @@ The app is fully responsive with:
 - Swipe-friendly card layouts
 
 
+
+
