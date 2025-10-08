@@ -35,6 +35,11 @@ class ApiService {
       const response = await fetch(url, config);
       
       if (!response.ok) {
+        // Handle 429 (Too Many Requests) specially
+        if (response.status === 429) {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(data.message || 'YouTube API quota exceeded. Please try again later.');
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
