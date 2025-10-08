@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAIDiscovery } from '../hooks/useAIDiscovery';
 import '../styles/MatchCard.css';
 
@@ -7,6 +7,7 @@ const MatchCard = ({ match, showHighlights = true }) => {
   const [hasHighlights, setHasHighlights] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const hasCheckedForHighlightsRef = useRef(false);
 
   // Function to get display name for competition (maps backend names to frontend display names)
   const getCompetitionDisplayName = (competitionName) => {
@@ -61,9 +62,11 @@ const MatchCard = ({ match, showHighlights = true }) => {
     }
   }, [clearDiscoveryError, discoverHighlights, match.id, checkForHighlights]);
 
-  // Auto-discover highlights when card expands
+  // Auto-discover highlights when card expands (run only once per expansion)
   useEffect(() => {
-    if (isExpanded && showHighlights && match.id && !discovering) {
+    if (isExpanded && showHighlights && match.id && !hasCheckedForHighlightsRef.current) {
+      hasCheckedForHighlightsRef.current = true;
+      
       // First check if highlights already exist
       checkForHighlights().then(() => {
         // If no highlights found, then discover new ones
@@ -72,7 +75,14 @@ const MatchCard = ({ match, showHighlights = true }) => {
         }
       });
     }
-  }, [isExpanded, showHighlights, match.id, discovering, checkForHighlights, handleDiscoverHighlights, hasHighlights]);
+    
+    // Reset the flag when card is collapsed
+    if (!isExpanded) {
+      hasCheckedForHighlightsRef.current = false;
+    }
+    // We only want this to run when the card expands/collapses, not on every render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isExpanded]);
 
   const handleCardClick = () => {
     setIsExpanded(!isExpanded);
