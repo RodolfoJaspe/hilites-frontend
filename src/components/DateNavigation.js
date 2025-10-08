@@ -10,7 +10,7 @@ const DateNavigation = ({ selectedDate, onDateChange }) => {
     const today = new Date();
     
     // Generate dates for the past 30 days
-    for (let i = 8; i >= 0; i--) {
+    for (let i = 29; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(today.getDate() - i);
       

@@ -1,14 +1,15 @@
 .date-navigation-container {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   background: #1a1a1a;
   position: relative;
-  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 .date-navigation {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 16px 0px;
   padding-bottom: 0px;
   gap: 20px;
@@ -16,6 +17,7 @@
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
   flex: 1;
+  min-width: 0; /* Important for flex overflow */
   scroll-behavior: smooth;
 }
 
@@ -33,7 +35,13 @@
   cursor: pointer;
   transition: background-color 0.2s;
   z-index: 10;
-  position: relative;
+  flex-shrink: 0; /* Prevent buttons from shrinking */
+  min-width: 44px; /* Fixed minimum width for consistent sizing */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent; /* Remove blue highlight on mobile tap */
+  outline: none; /* Remove default outline */
 }
 
 .scroll-button:hover {
@@ -42,6 +50,12 @@
 
 .scroll-button:active {
   background: #555;
+}
+
+.scroll-button:focus-visible {
+  /* Only show outline for keyboard navigation, not touch */
+  outline: 2px solid #007bff;
+  outline-offset: -2px;
 }
 
 .scroll-left {
@@ -103,6 +117,7 @@
   .scroll-button {
     font-size: 18px;
     padding: 12px 8px;
+    min-width: 40px;
   }
 }
 
@@ -121,5 +136,6 @@
   .scroll-button {
     font-size: 16px;
     padding: 10px 6px;
+    min-width: 36px;
   }
 }

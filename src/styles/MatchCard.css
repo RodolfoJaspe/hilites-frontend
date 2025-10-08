@@ -154,6 +154,20 @@
   margin-bottom: 15px;
 }
 
+.discovery-error p {
+  margin: 0 0 5px 0;
+}
+
+.discovery-error p:last-of-type {
+  margin-bottom: 0;
+}
+
+.error-hint {
+  font-size: 13px;
+  opacity: 0.9;
+  font-style: italic;
+}
+
 .clear-error {
   background: none;
   border: none;
@@ -161,6 +175,7 @@
   font-size: 18px;
   cursor: pointer;
   padding: 5px;
+  align-self: flex-start;
 }
 
 .clear-error:hover {

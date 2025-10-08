@@ -1,13 +1,23 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useHighlightsCache } from '../context/HighlightsCacheContext';
 import { useAIDiscovery } from '../hooks/useAIDiscovery';
 import '../styles/MatchCard.css';
 
 const MatchCard = ({ match, showHighlights = true }) => {
   const [highlights, setHighlights] = useState([]);
   const [hasHighlights, setHasHighlights] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const hasCheckedForHighlightsRef = useRef(false);
+  
+  // Use cache context for expansion state and caching
+  const { 
+    expandedMatchId, 
+    toggleExpandedMatch,
+    getCachedHighlights,
+    setCachedHighlights
+  } = useHighlightsCache();
+  
+  const isExpanded = expandedMatchId === match.id;
 
   // Function to get display name for competition (maps backend names to frontend display names)
   const getCompetitionDisplayName = (competitionName) => {
@@ -29,37 +39,53 @@ const MatchCard = ({ match, showHighlights = true }) => {
 
   const checkForHighlights = useCallback(async () => {
     try {
-      console.log('🔍 Checking for highlights for match:', match.id, match.competition_name, match.home_team?.name, match.away_team?.name);
+      // Check cache first
+      const cached = getCachedHighlights(match.id);
+      if (cached !== null) {
+        setHighlights(cached.highlights);
+        setHasHighlights(cached.hasHighlights);
+        
+        if (cached.hasHighlights && cached.highlights.length > 0) {
+          setSelectedVideo(cached.highlights[0]);
+        }
+        
+        return cached.hasHighlights;
+      }
+      
+      // Cache miss, fetch from API
       const response = await getAIDiscoveredHighlights(match.id);
-      console.log('📊 Highlights response:', response);
       if (response.success && response.data.length > 0) {
         setHighlights(response.data);
         setHasHighlights(true);
-        console.log('✅ Found highlights:', response.data.length);
+        
+        // Cache the results
+        setCachedHighlights(match.id, response.data, true);
         
         // Auto-play the first video found
-        if (response.data.length > 0) {
-          console.log('🎬 Auto-playing first video:', response.data[0].title);
-          setSelectedVideo(response.data[0]);
-        }
+        setSelectedVideo(response.data[0]);
+        return true;
       } else {
         setHasHighlights(false);
-        console.log('❌ No highlights found');
+        // Cache the negative result too
+        setCachedHighlights(match.id, [], false);
+        return false;
       }
     } catch (error) {
       console.error('Error checking for highlights:', error);
       setHasHighlights(false);
+      return false;
     }
-  }, [getAIDiscoveredHighlights, match.id]);
+  }, [getAIDiscoveredHighlights, match.id, getCachedHighlights, setCachedHighlights]);
 
   const handleDiscoverHighlights = useCallback(async () => {
     clearDiscoveryError();
     const result = await discoverHighlights(match.id);
     
     if (result.success) {
-      // Refresh highlights after discovery - this will auto-play the first video
-      await checkForHighlights();
+      // Refresh highlights after discovery (will fetch and cache)
+      return await checkForHighlights();
     }
+    return false;
   }, [clearDiscoveryError, discoverHighlights, match.id, checkForHighlights]);
 
   // Auto-discover highlights when card expands (run only once per expansion)
@@ -67,35 +93,38 @@ const MatchCard = ({ match, showHighlights = true }) => {
     if (isExpanded && showHighlights && match.id && !hasCheckedForHighlightsRef.current) {
       hasCheckedForHighlightsRef.current = true;
       
-      // First check if highlights already exist
-      checkForHighlights().then(() => {
-        // If no highlights found, then discover new ones
-        if (!hasHighlights) {
-          handleDiscoverHighlights();
+      // First check if highlights already exist (from cache or API), then discover if not found
+      const loadHighlights = async () => {
+        const found = await checkForHighlights();
+        // Only try to discover if no highlights were found
+        if (!found) {
+          await handleDiscoverHighlights();
         }
-      });
+      };
+      
+      loadHighlights();
     }
     
-    // Reset the flag when card is collapsed
+    // Reset state when card is collapsed
     if (!isExpanded) {
       hasCheckedForHighlightsRef.current = false;
+      // Don't reset highlights/hasHighlights - cache maintains them
+      // Only reset the selected video
+      setSelectedVideo(null);
     }
     // We only want this to run when the card expands/collapses, not on every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isExpanded]);
 
   const handleCardClick = () => {
-    setIsExpanded(!isExpanded);
+    toggleExpandedMatch(match.id);
   };
 
   const handlePlayVideo = (highlight) => {
-    console.log('🎬 Playing video:', highlight.title);
-    console.log('🔗 YouTube URL:', highlight.youtube_url);
     setSelectedVideo(highlight);
   };
 
   const handleShowAllVideos = () => {
-    console.log('📋 Showing all videos');
     setSelectedVideo(null);
   };
 
@@ -165,7 +194,14 @@ const MatchCard = ({ match, showHighlights = true }) => {
 
               {discoveryError && (
                 <div className="discovery-error">
-                  ⚠️ {discoveryError}
+                  {discoveryError.includes('Too many requests') ? (
+                    <>
+                      <p>⏳ Rate limit reached. Please wait a moment before trying more matches.</p>
+                      <p className="error-hint">Tip: Expand matches one at a time to avoid rate limits.</p>
+                    </>
+                  ) : (
+                    <p>⚠️ {discoveryError}</p>
+                  )}
                   <button onClick={clearDiscoveryError} className="clear-error">✕</button>
                 </div>
               )}
