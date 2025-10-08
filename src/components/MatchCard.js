@@ -29,7 +29,7 @@ const MatchCard = ({ match, showHighlights = true }) => {
 
   const checkForHighlights = useCallback(async () => {
     try {
-      console.log('🔍 Checking for highlights for match:', match.id);
+      console.log('🔍 Checking for highlights for match:', match.id, match.competition_name, match.home_team?.name, match.away_team?.name);
       const response = await getAIDiscoveredHighlights(match.id);
       console.log('📊 Highlights response:', response);
       if (response.success && response.data.length > 0) {
