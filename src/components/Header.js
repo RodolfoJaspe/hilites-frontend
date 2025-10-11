@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Header.css';
 import AuthModal from './AuthModal';
@@ -8,6 +9,7 @@ function Header() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const { user, profile, signOut } = useAuth();
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -74,7 +76,13 @@ function Header() {
                     <p className="profile-email">{user.email}</p>
                   </div>
                   <div className="profile-dropdown-divider" />
-                  <button className="profile-dropdown-item">
+                  <button 
+                    className="profile-dropdown-item"
+                    onClick={() => {
+                      navigate('/profile');
+                      setShowProfileMenu(false);
+                    }}
+                  >
                     <span>👤</span> Profile
                   </button>
                   <button className="profile-dropdown-item">

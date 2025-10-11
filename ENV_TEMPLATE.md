@@ -29,3 +29,4 @@ REACT_APP_SUPABASE_ANON_KEY=your-anon-key-here
 - These are the **same values** as in `hilites-backend/.env` (just with `REACT_APP_` prefix)
 - Don't commit this file to git
 - Restart the dev server after creating/updating `.env`
+

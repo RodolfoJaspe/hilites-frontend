@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { useMatches } from '../hooks/useMatches';
 import { useTeams } from '../hooks/useTeams';
+import apiService from '../services/api';
 import '../styles/Home.css';
 import DateNavigation from './DateNavigation';
-import FollowingSection from './FollowingSection';
 import MatchCard from './MatchCard';
 
 function Home() {
   const [selectedDate, setSelectedDate] = useState('today');
   const [expandedCompetitions, setExpandedCompetitions] = useState({});
-  const [isLoggedIn] = useState(false); // TODO: Get from auth context
+  const [favoriteMatches, setFavoriteMatches] = useState([]);
+  const [loadingFavorites, setLoadingFavorites] = useState(false);
+  const { user, session } = useAuth();
   
   // Matches data and functions
   const {
@@ -25,6 +28,34 @@ function Home() {
     getTeamsByLeague,
     fetchTeams
   } = useTeams();
+
+  // Fetch favorite team matches
+  const fetchFavoriteMatches = useCallback(async () => {
+    if (!user || !session?.access_token) {
+      setFavoriteMatches([]);
+      return;
+    }
+
+    setLoadingFavorites(true);
+    try {
+      const matches = await apiService.getFavoriteTeamMatches(session.access_token, 50);
+      setFavoriteMatches(matches || []);
+    } catch (error) {
+      console.error('Error fetching favorite team matches:', error);
+      setFavoriteMatches([]);
+    } finally {
+      setLoadingFavorites(false);
+    }
+  }, [user, session]);
+
+  // Load favorite matches when user logs in
+  useEffect(() => {
+    if (user && session) {
+      fetchFavoriteMatches();
+    } else {
+      setFavoriteMatches([]);
+    }
+  }, [user, session, fetchFavoriteMatches]);
 
   // Filter matches by selected date
   const filterMatchesByDate = (matches, selectedDate) => {
@@ -184,19 +215,38 @@ function Home() {
 
   return (
     <div className="home">
+      {/* Favorite Teams Section (only if logged in and has favorites) */}
+      {user && favoriteMatches.length > 0 && (
+        <div className="favorites-section">
+          <div className="favorites-header">
+            <h2>⭐ Your Favorite Teams</h2>
+            <p className="favorites-subtitle">Latest matches from teams you follow</p>
+          </div>
+          
+          {loadingFavorites ? (
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+              <p>Loading favorite team matches...</p>
+            </div>
+          ) : (
+            <div className="favorites-matches-grid">
+              {favoriteMatches.map(match => (
+                <MatchCard
+                  key={match.id}
+                  match={match}
+                  showHighlights={true}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Date Navigation */}
       <DateNavigation 
         selectedDate={selectedDate}
         onDateChange={handleDateChange}
       />
-
-      {/* Following Section (only if logged in) */}
-      {isLoggedIn && (
-        <FollowingSection 
-          matches={filteredMatches}
-          loading={matchesLoading}
-        />
-      )}
 
       {/* Competition Sections */}
       <div className="competitions-container">

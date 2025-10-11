@@ -241,6 +241,44 @@ class ApiService {
       },
     });
   }
+
+  // New Favorite Teams methods (with Supabase auth)
+  async getFavoriteTeamsAuth(accessToken) {
+    return this.request('/favorite-teams', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+  }
+
+  async addFavoriteTeamAuth(accessToken, teamId) {
+    return this.request('/favorite-teams', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ teamId }),
+    });
+  }
+
+  async removeFavoriteTeamAuth(accessToken, teamId) {
+    return this.request(`/favorite-teams/${teamId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+  }
+
+  async getFavoriteTeamMatches(accessToken, limit = 50) {
+    return this.request(`/favorite-teams/matches?limit=${limit}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+  }
 }
 
 // Create and export a singleton instance
