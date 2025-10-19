@@ -51,7 +51,7 @@ function Header() {
   return (
     <>
       <div className="header">
-        <h1>Hilites</h1>
+        <h1><a href="/" style={{ textDecoration: 'none', color: 'white' }}>Hilites</a></h1>
         
         <div className="header-actions">
           {user ? (
