@@ -24,15 +24,21 @@ class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     
     const config = {
+      method: options.method || 'GET',
       mode: 'cors',
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        'Origin': window.location.origin,
+        'Accept': 'application/json',
         ...options.headers,
       },
       ...options,
     };
+
+    // Ensure we don't override the Content-Type if it's set in options (e.g., for FormData)
+    if (options.body && options.body instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
 
     try {
       const response = await fetch(url, config);
