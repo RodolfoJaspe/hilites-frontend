@@ -23,19 +23,24 @@ class ApiService {
 
     const url = `${this.baseURL}${endpoint}`;
     
+    // Default headers
+    const defaultHeaders = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    };
+
     const config = {
       method: options.method || 'GET',
       mode: 'cors',
       credentials: 'include',
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        ...defaultHeaders,
         ...options.headers,
       },
       ...options,
     };
 
-    // Ensure we don't override the Content-Type if it's set in options (e.g., for FormData)
+    // Handle FormData - don't set Content-Type for FormData
     if (options.body && options.body instanceof FormData) {
       delete config.headers['Content-Type'];
     }
