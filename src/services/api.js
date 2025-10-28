@@ -24,8 +24,11 @@ class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     
     const config = {
+      mode: 'cors',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        'Origin': window.location.origin,
         ...options.headers,
       },
       ...options,
